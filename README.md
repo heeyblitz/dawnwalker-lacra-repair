@@ -1,4 +1,3 @@
-[README_Lacra_GITHUB_FINAL.md](https://github.com/user-attachments/files/32848980/README_Lacra_GITHUB_FINAL.md)
 # The Blood of Dawnwalker — Lacra Questline Repair
 
 > ⚠️ **BETA / EXPERIMENTAL**
@@ -278,10 +277,12 @@ This is intentional. A failed repair is preferable to blindly modifying an unkno
 - A known-good save
 - Your current save
 
-The script supports either:
+The script supports two decompression methods:
 
-- `oo2core_9_win64.dll`
-- an `ooz` executable
+- **`ooz` executable** — the recommended method for this repository
+- **`oo2core_9_win64.dll`** — an alternative supported by the script
+
+For the workflow documented here, the examples use `ooz`.
 
 The tested save format is:
 
@@ -371,15 +372,60 @@ dawnwalker_lacra_repair.py
 
 Place it somewhere convenient.
 
-You also need access to the required Oodle/Kraken decompression support.
+## Oodle / Kraken decompression
 
-For example:
+Dawnwalker's `.sav` files contain Oodle/Kraken-compressed data. The repair
+script needs a decompressor to read those blocks.
+
+This repository supports an external **`ooz`** executable. `ooz` is an
+open-source Kraken/Oodle decompressor.
+
+Project:
+
+https://github.com/powzix/ooz
+
+Download/build `ooz` for your environment and make sure the executable is
+accessible from the command prompt.
+
+For example, if `ooz.exe` is in the same directory as the repair script:
+
+```text
+dawnwalker_lacra_repair.py
+ooz.exe
+```
+
+You can then use:
+
+```bat
+--ooz ooz.exe
+```
+
+If `ooz.exe` is already in your system `PATH`, you can simply use:
+
+```bat
+--ooz ooz
+```
+
+### Alternative: Oodle DLL
+
+The script also supports loading an Oodle runtime DLL directly:
 
 ```text
 oo2core_9_win64.dll
 ```
 
-Keep the script, DLL, and save files accessible from the command prompt.
+This is an alternative to `ooz`; you do **not** need both.
+
+If you already have a compatible Oodle DLL, pass it with:
+
+```bat
+--oodle-dll oo2core_9_win64.dll
+```
+
+Do not download random DLL files from generic DLL-download websites.
+
+Keep the script, decompressor, and save files accessible from the command
+prompt.
 
 ---
 
@@ -392,7 +438,7 @@ python dawnwalker_lacra_repair.py ^
     --good ManualSave75.sav ^
     --current ManualSave79.sav ^
     --output ManualSave_LacraFix.sav ^
-    --oodle-dll oo2core_9_win64.dll
+    --ooz ooz.exe
 ```
 
 Where:
@@ -410,6 +456,13 @@ ManualSave_LacraFix.sav
 
 Replace these filenames with your own.
 
+If your `ooz` executable has a different filename or is stored elsewhere,
+replace `ooz.exe` with its path, for example:
+
+```bat
+--ooz "C:\Tools\ooz.exe"
+```
+
 ---
 
 # Analyze Mode
@@ -421,7 +474,7 @@ python dawnwalker_lacra_repair.py ^
     --good ManualSave75.sav ^
     --current ManualSave79.sav ^
     --analyze ^
-    --oodle-dll oo2core_9_win64.dll
+    --ooz ooz.exe
 ```
 
 The analysis reports information including:
@@ -443,6 +496,19 @@ This is useful if you want to inspect the saves before creating a repaired file.
 
 # Repair Modes
 
+All examples below use the `ooz` decompressor. If you prefer the DLL
+method, replace:
+
+```bat
+--ooz ooz.exe
+```
+
+with:
+
+```bat
+--oodle-dll oo2core_9_win64.dll
+```
+
 The default mode attempts both:
 
 ```text
@@ -461,7 +527,7 @@ python dawnwalker_lacra_repair.py ^
     --current CURRENT.sav ^
     --output FIXED.sav ^
     --no-lacra ^
-    --oodle-dll oo2core_9_win64.dll
+    --ooz ooz.exe
 ```
 
 Use this if you only want the original q103-style repair.
@@ -478,7 +544,7 @@ python dawnwalker_lacra_repair.py ^
     --current CURRENT.sav ^
     --output FIXED.sav ^
     --no-q103 ^
-    --oodle-dll oo2core_9_win64.dll
+    --ooz ooz.exe
 ```
 
 This can be useful if the original q103 fix has already been applied and the remaining problem is specifically that Lacra is missing during the encounter.
@@ -626,7 +692,7 @@ python dawnwalker_lacra_repair.py ^
     --good GOOD.sav ^
     --current CURRENT.sav ^
     --analyze ^
-    --oodle-dll oo2core_9_win64.dll
+    --ooz ooz.exe
 ```
 
 If the signature count is not exactly:
